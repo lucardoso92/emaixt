@@ -29,7 +29,7 @@ class Emaixt:
             response = requests.get(
                 url=self.website,
                 headers=headers,
-                timeout=5,
+                timeout=10,
                 verify=False
             )
 
@@ -48,8 +48,7 @@ class Emaixt:
             emails += [self._clean_mail(x) for x in mailtos]
 
             # search @regex
-            regex = r'(?:[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])'
-            # regex = r'^[a-zA-Z0-9-_]+@[a-zA-Z0-9]+\.[a-z]{1,3}$'
+            regex = r'[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)'
             emails_regex = re.finditer(regex, page)
             emails += [self._clean_mail(x.group(0)) for x in emails_regex]
 
@@ -109,7 +108,7 @@ def parse_args() -> argparse.ArgumentParser:
     return parser.parse_args()
 
 
-def test_pipe():
+def test_pipe() -> bool:
     try:
         return sys.argv[1] == 'pipe'
     except Exception:
@@ -121,7 +120,7 @@ def execute(url: str, silent: bool = True) -> None:
     emxt.main()
 
 
-def interactive():
+def interactive() -> None:
     pipe = test_pipe()
 
     if not pipe:
