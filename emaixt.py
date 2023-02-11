@@ -27,8 +27,6 @@ class Emaixt:
         if response.status_code == 200:
             return response.text
 
-        raise 'site not working'
-
     def _get_emails(self, page: str) -> list:
         page_lxml = html.fromstring(page)
         emails = list()
@@ -47,9 +45,10 @@ class Emaixt:
 
     def main(self) -> None:
         page = self._get_page()
-        emails = self._get_emails(page=page)
-        for email in emails:
-            print(email)
+        if page:
+            emails = self._get_emails(page=page)
+            for email in emails:
+                print(email)
 
 
 def baner(silent: bool) -> None:
