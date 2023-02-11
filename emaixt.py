@@ -26,7 +26,8 @@ class Emaixt:
             response = requests.get(
                 url=self.website,
                 headers=headers,
-                timeout=5
+                timeout=5,
+                verify=False
             )
 
             if response.status_code == 200:
