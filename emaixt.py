@@ -1,9 +1,12 @@
 import re
 import argparse
 import sys
+import urllib3
 import requests
 from lxml import html
 from multiprocessing.pool import Pool
+
+urllib3.disable_warnings()
 
 
 class Emaixt:
