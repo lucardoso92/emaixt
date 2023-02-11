@@ -3,6 +3,7 @@ import argparse
 import sys
 import requests
 from lxml import html
+from multiprocessing.pool import Pool
 
 
 class Emaixt:
@@ -81,6 +82,7 @@ def parse_args() -> argparse.ArgumentParser:
         help="URL to enumerate emails",
         required=True
     )
+
     parser.add_argument(
         '-s',
         '--silent',
@@ -88,21 +90,39 @@ def parse_args() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction
     )
     parser.set_defaults(silent=False)
+    parser.set_defaults(pipe=False)
 
     return parser.parse_args()
 
 
-def interactive():
-    args = parse_args()
-    url = args.url
-    silent = args.silent
+def test_pipe():
+    try:
+        return sys.argv[1] == 'pipe'
+    except Exception:
+        return False
 
-    baner(silent=silent)
 
+def execute(url: str, silent: bool = True) -> None:
     emxt = Emaixt(website=url, silent=silent)
     emxt.main()
-    if not silent:
-        print()
+
+
+def interactive():
+    pipe = test_pipe()
+
+    if not pipe:
+        args = parse_args()
+        url = args.url
+        silent = args.silent
+        baner(silent=silent)
+        execute(url, silent)
+
+        if not silent:
+            print()
+    else:
+        sites = [line.strip() for line in sys.stdin]
+        pool = Pool(processes=5)
+        pool.map(execute, sites)
 
 
 if __name__ == '__main__':
