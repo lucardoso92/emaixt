@@ -3,6 +3,7 @@ import argparse
 import sys
 import urllib3
 import requests
+from functools import partial
 from lxml import html
 from multiprocessing.pool import Pool
 
@@ -90,52 +91,56 @@ def parse_args() -> argparse.ArgumentParser:
     parser._optionals.title = "OPTIONS"
 
     parser.add_argument(
-        '-u',
-        '--url',
-        help="URL to enumerate emails",
-        required=True
-    )
-
-    parser.add_argument(
         '-s',
         '--silent',
         help='Enable the silent mode',
         action=argparse.BooleanOptionalAction
     )
+
+    parser.add_argument(
+        '-p',
+        '--pipe',
+        help='Enable the pipe mode',
+        action=argparse.BooleanOptionalAction
+    )
+
+    parser.add_argument(
+        '-u',
+        '--url',
+        help="URL to enumerate emails",
+        required='--pipe' not in sys.argv
+    )
+
     parser.set_defaults(silent=False)
     parser.set_defaults(pipe=False)
 
-    return parser.parse_args()
+    final_parser = parser.parse_args()
+
+    return final_parser
 
 
-def test_pipe() -> bool:
-    try:
-        return sys.argv[1] == 'pipe'
-    except Exception:
-        return False
-
-
-def execute(url: str, silent: bool = True) -> None:
+def execute(silent: bool, url: str) -> None:
     emxt = Emaixt(website=url, silent=silent)
     emxt.main()
 
 
 def interactive() -> None:
-    pipe = test_pipe()
+    args = parse_args()
+    silent = args.silent
+    
+    baner(silent=silent)
 
-    if not pipe:
-        args = parse_args()
-        url = args.url
-        silent = args.silent
-        baner(silent=silent)
+    if not args.pipe:
+        url = args.url    
         execute(url, silent)
-
-        if not silent:
-            print()
     else:
         sites = [line.strip() for line in sys.stdin]
+        func = partial(execute, silent)
         pool = Pool(processes=5)
-        pool.map(execute, sites)
+        pool.map(func, sites)
+    
+    if not silent:
+        print()
 
 
 if __name__ == '__main__':
