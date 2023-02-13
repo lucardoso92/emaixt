@@ -132,7 +132,7 @@ def interactive() -> None:
 
     if not args.pipe:
         url = args.url
-        execute(url, silent)
+        execute(silent, url)
     else:
         sites = [line.strip() for line in sys.stdin]
         func = partial(execute, silent)
