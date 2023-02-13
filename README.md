@@ -2,4 +2,4 @@
 <p align="center"><b>The tool that extracts emails from a web page.</b></p>
 
 # Features
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/imgs/menu.png?raw=true)
+![alt text](https://github.com/uxcardoso/emaixt/blob/master/imgs/menu.png?raw=true)
