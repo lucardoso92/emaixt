@@ -76,7 +76,7 @@ def baner(silent: bool) -> None:
 ########## ###       ### ###     ### ########### ###    ###     ###     
 
 createdBy: Lucas Cardoso
-        '''
+'''
     if not silent:
         print(title)
 
@@ -127,18 +127,18 @@ def execute(silent: bool, url: str) -> None:
 def interactive() -> None:
     args = parse_args()
     silent = args.silent
-    
+
     baner(silent=silent)
 
     if not args.pipe:
-        url = args.url    
+        url = args.url
         execute(url, silent)
     else:
         sites = [line.strip() for line in sys.stdin]
         func = partial(execute, silent)
         pool = Pool(processes=5)
         pool.map(func, sites)
-    
+
     if not silent:
         print()
 
