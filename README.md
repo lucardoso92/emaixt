@@ -4,4 +4,7 @@
 # Example
 ![img](https://github.com/uxcardoso/emaixt/blob/master/img/screen.png?raw=false)
 
-
+# Installation
+```console
+pip3 install -r requirementx.txt
+```
