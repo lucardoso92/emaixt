@@ -6,7 +6,7 @@
 
 ## Installation
 ```console
-pip3 install -r requirementx.txt
+pip3 install -r requirements.txt
 ```
 
 ## Usage
@@ -29,7 +29,7 @@ OPTIONS:
 Example: python emaixt.py -u https://www.example.com/contact
 ```
 
-## Running EMAILXT
+## Running EMAIXT
 
 ### URL Input
 ```console

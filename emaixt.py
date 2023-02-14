@@ -2,12 +2,15 @@ import re
 import argparse
 import sys
 import urllib3
-import requests
+from requests_html import HTMLSession
+
 from functools import partial
 from lxml import html
 from multiprocessing.pool import Pool
 
 urllib3.disable_warnings()
+
+requests = HTMLSession()
 
 
 class Emaixt:
@@ -33,10 +36,11 @@ class Emaixt:
                 timeout=10,
                 verify=False
             )
-
+            response.html.render()
             if response.status_code == 200:
-                return response.text
-        except Exception:
+                return response.html.raw_html.decode()
+        except Exception as e:
+            print(e)
             pass
 
     def _get_emails(self, page: str) -> list:
