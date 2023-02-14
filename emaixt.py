@@ -3,20 +3,19 @@ import argparse
 import sys
 import urllib3
 from requests_html import HTMLSession
-
+from requests import Session
 from functools import partial
 from lxml import html
 from multiprocessing.pool import Pool
 
 urllib3.disable_warnings()
 
-requests = HTMLSession()
-
 
 class Emaixt:
-    def __init__(self, website: str, silent: bool = False) -> None:
+    def __init__(self, website: str, silent: bool = False, js_render: bool = False) -> None:
         self.website = website
         self.silent = silent
+        self.js_render = js_render
 
     def _clean_mail(self, mail: str) -> str:
         mail = mail.strip()
@@ -27,18 +26,23 @@ class Emaixt:
 
     def _get_page(self):
         try:
+            session = Session() if not self.js_render else HTMLSession()
             headers = {
                 'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
             }
-            response = requests.get(
+            response = session.get(
                 url=self.website,
                 headers=headers,
                 timeout=10,
                 verify=False
             )
-            response.html.render()
+            if self.js_render:
+                response.html.render()
+                response_text = response.html.raw_html.decode()
+            else:
+                response_text = response.text
             if response.status_code == 200:
-                return response.html.raw_html.decode()
+                return response_text
         except Exception as e:
             pass
 
@@ -52,7 +56,7 @@ class Emaixt:
             emails += [self._clean_mail(x) for x in mailtos]
 
             # search @regex
-            regex = r'[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)'
+            regex = r'''(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])'''
             emails_regex = re.finditer(regex, page)
             emails += [self._clean_mail(x.group(0)) for x in emails_regex]
 
@@ -107,6 +111,13 @@ def parse_args() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        '-js',
+        '--js_render',
+        help='Enable the js render mode',
+        action=argparse.BooleanOptionalAction
+    )
+
+    parser.add_argument(
         '-u',
         '--url',
         help="URL to enumerate emails",
@@ -115,29 +126,31 @@ def parse_args() -> argparse.ArgumentParser:
 
     parser.set_defaults(silent=False)
     parser.set_defaults(pipe=False)
+    parser.set_defaults(js_render=False)
 
     final_parser = parser.parse_args()
 
     return final_parser
 
 
-def execute(silent: bool, url: str) -> None:
-    emxt = Emaixt(website=url, silent=silent)
+def execute(silent: bool, js_render: bool, url: str) -> None:
+    emxt = Emaixt(website=url, silent=silent, js_render=js_render)
     emxt.main()
 
 
 def interactive() -> None:
     args = parse_args()
     silent = args.silent
+    js_render = args.js_render
 
     baner(silent=silent)
 
     if not args.pipe:
         url = args.url
-        execute(silent, url)
+        execute(silent, js_render, url)
     else:
         sites = [line.strip() for line in sys.stdin]
-        func = partial(execute, silent)
+        func = partial(execute, silent, js_render)
         pool = Pool(processes=5)
         pool.map(func, sites)
 
