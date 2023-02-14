@@ -37,8 +37,15 @@ python3 emaixt.py -u https://www.tesla.com/contact
 ```
 ### STDIN (piped) Input
 ```console
-echo https://www.tesla.com/contact | python3 emaixt.py
+echo https://www.tesla.com/contact | python3 emaixt.py --pipe
 ```
 ```console
-cat urls.py | python3 emaixt.py
+cat urls.py | python3 emaixt.py --pipe
+```
+### Render JS (slow mode)
+```console
+python3 emaixt.py -u https://www.randomlists.com/email-addresses -js
+```
+```console
+echo https://www.randomlists.com/email-addresses | python3 emaixt.py --pipe -js
 ```
