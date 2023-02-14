@@ -113,7 +113,7 @@ def parse_args() -> argparse.ArgumentParser:
     parser.add_argument(
         '-js',
         '--js_render',
-        help='Enable the js render mode',
+        help='Enable the js render mode (slow mode)',
         action=argparse.BooleanOptionalAction
     )
 
