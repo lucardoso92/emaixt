@@ -40,7 +40,6 @@ class Emaixt:
             if response.status_code == 200:
                 return response.html.raw_html.decode()
         except Exception as e:
-            print(e)
             pass
 
     def _get_emails(self, page: str) -> list:
