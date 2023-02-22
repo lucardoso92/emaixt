@@ -2,11 +2,13 @@ import re
 import argparse
 import sys
 import urllib3
+from multiprocessing.pool import Pool
 from requests_html import HTMLSession
 from requests import Session
 from functools import partial
 from lxml import html
-from multiprocessing.pool import Pool
+from email_validator import validate_email, EmailNotValidError
+
 
 urllib3.disable_warnings()
 
@@ -46,6 +48,16 @@ class Emaixt:
         except Exception as e:
             pass
 
+    def _validate_email(self, email):
+        try:
+            validation = validate_email(email)
+
+            email = validation.email
+            return email
+
+        except EmailNotValidError:
+            return ''
+
     def _get_emails(self, page: str) -> list:
         try:
             page_lxml = html.fromstring(page)
@@ -60,7 +72,12 @@ class Emaixt:
             emails_regex = re.finditer(regex, page)
             emails += [self._clean_mail(x.group(0)) for x in emails_regex]
 
+            # Validate email
+            emails = [self._validate_email(x) for x in emails]
+            emails = [x for x in emails if x != '']
+
             return list(dict.fromkeys(emails))
+
         except ValueError:
             return []
 
