@@ -8,6 +8,7 @@ from requests import Session
 from functools import partial
 from lxml import html
 from email_validator import validate_email, EmailNotValidError
+from fake_useragent import UserAgent
 
 
 urllib3.disable_warnings()
@@ -29,8 +30,9 @@ class Emaixt:
     def _get_page(self):
         try:
             session = Session() if not self.js_render else HTMLSession()
+            ua = UserAgent()
             headers = {
-                'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+                "User-Agent": ua.random,
             }
             response = session.get(
                 url=self.website,
@@ -46,6 +48,7 @@ class Emaixt:
             if response.status_code == 200:
                 return response_text
         except Exception as e:
+            print('[error] -', e)
             pass
 
     def _validate_email(self, email):
@@ -97,7 +100,7 @@ def baner(silent: bool) -> None:
 ██╔══╝  ██║╚██╔╝██║██╔══██║██║ ██╔██╗    ██║   
 ███████╗██║ ╚═╝ ██║██║  ██║██║██╔╝ ██╗   ██║   
 ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝   ╚═╝   
-                                               
+                                             
 Author: Lucas Cardoso
 '''
     if not silent:
