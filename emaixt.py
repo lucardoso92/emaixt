@@ -47,8 +47,7 @@ class Emaixt:
                 response_text = response.text
             if response.status_code == 200:
                 return response_text
-        except Exception as e:
-            print('[error] -', e)
+        except Exception:
             pass
 
     def _validate_email(self, email):
